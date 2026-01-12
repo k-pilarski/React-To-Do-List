@@ -35,6 +35,12 @@ function App() {
     setTodos(todos.filter(todo => todo.id !== id))
   }
 
+  const editTodo = (id, newText) => {
+    setTodos(todos.map(todo => 
+      todo.id === id ? { ...todo, text: newText } : todo
+    ))
+  }
+
   return (
     <div className="min-h-screen w-full bg-gray-100 flex items-center justify-center py-10">
       <div className="bg-white p-8 rounded-xl shadow-lg w-full max-w-md">
@@ -49,6 +55,7 @@ function App() {
               todo={todo} 
               toggleComplete={toggleComplete} 
               deleteTodo={deleteTodo}
+              editTodo={editTodo}
             />
           ))}
           
