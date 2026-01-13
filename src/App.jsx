@@ -16,10 +16,11 @@ function App() {
     localStorage.setItem("todos", JSON.stringify(todos))
   }, [todos])
 
-  const addTodo = (text) => {
+  const addTodo = (text, category) => {
     const newTodo = {
       id: Date.now(),
       text: text,
+      category: category,
       isCompleted: false
     }
     setTodos([...todos, newTodo])
