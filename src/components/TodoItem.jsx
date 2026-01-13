@@ -2,8 +2,8 @@ import { useState } from 'react'
 
 function TodoItem({ todo, toggleComplete, deleteTodo, editTodo }) {
     const [isEditing, setIsEditing] = useState(false)
-
     const [newText, setNewText] = useState(todo.text)
+    const [newCategory, setNewCategory] = useState(todo.category)
 
     const categoryConfig = {
       general: { label: 'General', style: 'bg-gray-200 text-gray-600' },
@@ -15,7 +15,7 @@ function TodoItem({ todo, toggleComplete, deleteTodo, editTodo }) {
     const currentCategory = categoryConfig[todo.category] || categoryConfig.general
 
     const handleSave = () => {
-        editTodo(todo.id, newText)
+        editTodo(todo.id, newText, newCategory)
         setIsEditing(false)
     }
   
@@ -34,13 +34,25 @@ function TodoItem({ todo, toggleComplete, deleteTodo, editTodo }) {
         </div>
 
         {isEditing ? (
-          <input 
-            type="text"
-            value={newText}
-            onChange={(e) => setNewText(e.target.value)}
-            className="w-full border-b-2 border-blue-500 focus:outline-none px-1 text-gray-700"
-            autoFocus 
-          />
+          <div className="flex flex-col w-full gap-2 pr-4">
+            <input 
+              type="text"
+              value={newText}
+              onChange={(e) => setNewText(e.target.value)}
+              className="w-full border-b-2 border-blue-500 focus:outline-none px-1 text-gray-700"
+              autoFocus 
+            />
+            <select 
+              value={newCategory}
+              onChange={(e) => setNewCategory(e.target.value)}
+              className="text-xs border border-gray-300 rounded p-1 w-fit bg-gray-50 focus:outline-none focus:border-blue-500"
+            >
+              <option value="general">General</option>
+              <option value="work">Work</option>
+              <option value="home">Home</option>
+              <option value="urgent">Urgent</option>
+            </select>
+          </div>
         ) : (
           <div className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-3">
              <span 
@@ -59,7 +71,7 @@ function TodoItem({ todo, toggleComplete, deleteTodo, editTodo }) {
         )}
       </div>
 
-      <div className="flex gap-2 ml-4">
+      <div className="flex gap-2 ml-4 self-start sm:self-center">
         {isEditing ? (
           <button 
             onClick={handleSave}
@@ -69,7 +81,11 @@ function TodoItem({ todo, toggleComplete, deleteTodo, editTodo }) {
           </button>
         ) : (
           <button 
-            onClick={() => setIsEditing(true)}
+            onClick={() => {
+              setIsEditing(true)
+              setNewText(todo.text)
+              setNewCategory(todo.category)
+            }}
             className="text-yellow-600 hover:bg-yellow-50 px-2 py-1 rounded transition-colors font-medium text-sm"
           >
             Edit

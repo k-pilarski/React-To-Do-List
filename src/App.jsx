@@ -36,9 +36,9 @@ function App() {
     setTodos(todos.filter(todo => todo.id !== id))
   }
 
-  const editTodo = (id, newText) => {
+  const editTodo = (id, newText, newCategory) => {
     setTodos(todos.map(todo => 
-      todo.id === id ? { ...todo, text: newText } : todo
+      todo.id === id ? { ...todo, text: newText, category: newCategory } : todo
     ))
   }
 
