@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import TodoForm from './components/TodoForm'
 import TodoItem from './components/TodoItem'
+import Filter from './components/Filter'
 
 function App() {
   const [todos, setTodos] = useState(() => {
@@ -11,6 +12,8 @@ function App() {
       return []
     }
   })
+
+  const [filter, setFilter] = useState("all")
 
   useEffect(() => {
     localStorage.setItem("todos", JSON.stringify(todos))
@@ -42,15 +45,22 @@ function App() {
     ))
   }
 
+  const filteredTodos = todos.filter(todo => {
+    if (filter === 'all') return true
+    return todo.category === filter
+  })
+
   return (
     <div className="min-h-screen w-full bg-gray-100 flex items-center justify-center py-10">
-      <div className="bg-white p-8 rounded-xl shadow-lg w-full max-w-md">
+      <div className="bg-white p-8 rounded-xl shadow-lg w-full max-w-lg">
         <h1 className="text-2xl font-bold mb-6 text-gray-800 text-center">My To Do List</h1>
         
         <TodoForm addTodo={addTodo} />
 
+        <Filter filter={filter} setFilter={setFilter} />
+
         <div className="mt-6 space-y-2">
-          {todos.map((todo) => (
+          {filteredTodos.map((todo) => (
             <TodoItem 
               key={todo.id} 
               todo={todo} 
@@ -60,6 +70,10 @@ function App() {
             />
           ))}
           
+          {filteredTodos.length === 0 && todos.length > 0 && (
+            <p className="text-gray-400 text-center text-sm">There are no tasks in this category.</p>
+          )}
+
           {todos.length === 0 && (
             <p className="text-gray-400 text-center">No tasks. Add something!</p>
           )}
