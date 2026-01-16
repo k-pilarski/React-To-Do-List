@@ -19,11 +19,12 @@ function App() {
     localStorage.setItem("todos", JSON.stringify(todos))
   }, [todos])
 
-  const addTodo = (text, category) => {
+  const addTodo = (text, category, priority) => {
     const newTodo = {
       id: Date.now(),
       text: text,
       category: category,
+      priority: priority,
       isCompleted: false
     }
     setTodos([...todos, newTodo])
@@ -39,9 +40,9 @@ function App() {
     setTodos(todos.filter(todo => todo.id !== id))
   }
 
-  const editTodo = (id, newText, newCategory) => {
+  const editTodo = (id, newText, newCategory, newPriority) => {
     setTodos(todos.map(todo => 
-      todo.id === id ? { ...todo, text: newText, category: newCategory } : todo
+      todo.id === id ? { ...todo, text: newText, category: newCategory, priority: newPriority } : todo
     ))
   }
 
@@ -52,7 +53,7 @@ function App() {
 
   return (
     <div className="min-h-screen w-full bg-gray-100 flex items-center justify-center py-10">
-      <div className="bg-white p-8 rounded-xl shadow-lg w-full max-w-lg">
+      <div className="bg-white p-8 rounded-xl shadow-lg w-full max-w-xl">
         <h1 className="text-2xl font-bold mb-6 text-gray-800 text-center">My To Do List</h1>
         
         <TodoForm addTodo={addTodo} />
@@ -71,11 +72,11 @@ function App() {
           ))}
           
           {filteredTodos.length === 0 && todos.length > 0 && (
-            <p className="text-gray-400 text-center text-sm">There are no tasks in this category.</p>
+            <p className="text-gray-400 text-center text-sm">No tasks found in this category.</p>
           )}
 
           {todos.length === 0 && (
-            <p className="text-gray-400 text-center">No tasks. Add something!</p>
+            <p className="text-gray-400 text-center">No tasks yet. Add one above!</p>
           )}
         </div>
       </div>
