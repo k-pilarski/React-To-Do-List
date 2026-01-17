@@ -14,6 +14,7 @@ function App() {
   })
 
   const [filter, setFilter] = useState("all")
+  const [sortByPriority, setSortByPriority] = useState(false)
 
   useEffect(() => {
     localStorage.setItem("todos", JSON.stringify(todos))
@@ -46,10 +47,27 @@ function App() {
     ))
   }
 
-  const filteredTodos = todos.filter(todo => {
-    if (filter === 'all') return true
-    return todo.category === filter
-  })
+  const getProcessedTodos = () => {
+    let result = todos.filter(todo => {
+      if (filter === 'all') return true
+      return todo.category === filter
+    })
+
+    if (sortByPriority) {
+      const priorityWeight = { high: 3, normal: 2, low: 1 }
+      
+      result.sort((a, b) => {
+        const weightA = priorityWeight[a.priority] || 2
+        const weightB = priorityWeight[b.priority] || 2
+        
+        return weightB - weightA
+      })
+    }
+
+    return result
+  }
+
+  const displayedTodos = getProcessedTodos()
 
   return (
     <div className="min-h-screen w-full bg-gray-100 flex items-center justify-center py-10">
@@ -58,10 +76,15 @@ function App() {
         
         <TodoForm addTodo={addTodo} />
 
-        <Filter filter={filter} setFilter={setFilter} />
+        <Filter 
+          filter={filter} 
+          setFilter={setFilter} 
+          sortByPriority={sortByPriority}
+          setSortByPriority={setSortByPriority}
+        />
 
         <div className="mt-6 space-y-2">
-          {filteredTodos.map((todo) => (
+          {displayedTodos.map((todo) => (
             <TodoItem 
               key={todo.id} 
               todo={todo} 
@@ -71,8 +94,8 @@ function App() {
             />
           ))}
           
-          {filteredTodos.length === 0 && todos.length > 0 && (
-            <p className="text-gray-400 text-center text-sm">No tasks found in this category.</p>
+          {displayedTodos.length === 0 && todos.length > 0 && (
+            <p className="text-gray-400 text-center text-sm">No tasks match your criteria.</p>
           )}
 
           {todos.length === 0 && (

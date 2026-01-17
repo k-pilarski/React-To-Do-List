@@ -1,4 +1,4 @@
-function Filter({ filter, setFilter }) {
+function Filter({ filter, setFilter, sortByPriority, setSortByPriority }) {
   const options = [
     { key: 'all', label: 'All' },
     { key: 'general', label: 'General' },
@@ -8,20 +8,34 @@ function Filter({ filter, setFilter }) {
   ]
 
   return (
-    <div className="flex flex-wrap gap-2 mb-4 justify-center">
-      {options.map((option) => (
-        <button
-          key={option.key}
-          onClick={() => setFilter(option.key)}
-          className={`px-3 py-1 rounded-full text-sm font-medium transition-colors border ${
-            filter === option.key
-              ? 'bg-gray-800 text-white border-gray-800'
-              : 'bg-white text-gray-600 border-gray-200 hover:bg-gray-50'
-          }`}
-        >
-          {option.label}
-        </button>
-      ))}
+    <div className="flex flex-col sm:flex-row justify-between items-center gap-4 mb-6">
+      <div className="flex flex-wrap gap-2 justify-center">
+        {options.map((option) => (
+          <button
+            key={option.key}
+            onClick={() => setFilter(option.key)}
+            className={`px-3 py-1 rounded-full text-sm font-medium transition-colors border ${
+              filter === option.key
+                ? 'bg-gray-800 text-white border-gray-800'
+                : 'bg-white text-gray-600 border-gray-200 hover:bg-gray-50'
+            }`}
+          >
+            {option.label}
+          </button>
+        ))}
+      </div>
+
+      <button 
+        onClick={() => setSortByPriority(!sortByPriority)}
+        className={`px-3 py-1 rounded-lg text-sm font-bold transition-colors flex items-center gap-1 border ${
+          sortByPriority 
+            ? 'bg-blue-100 text-blue-700 border-blue-200' 
+            : 'bg-white text-gray-500 border-gray-200 hover:bg-gray-50'
+        }`}
+      >
+        <span>Sort by Priority</span>
+        <span>{sortByPriority ? '⬇' : '↕'}</span>
+      </button>
     </div>
   )
 }
