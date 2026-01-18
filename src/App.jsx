@@ -14,7 +14,7 @@ function App() {
   })
 
   const [filter, setFilter] = useState("all")
-  const [sortByPriority, setSortByPriority] = useState(false)
+  const [sortOrder, setSortOrder] = useState(null)
 
   useEffect(() => {
     localStorage.setItem("todos", JSON.stringify(todos))
@@ -53,14 +53,18 @@ function App() {
       return todo.category === filter
     })
 
-    if (sortByPriority) {
+    if (sortOrder) {
       const priorityWeight = { high: 3, normal: 2, low: 1 }
       
       result.sort((a, b) => {
         const weightA = priorityWeight[a.priority] || 2
         const weightB = priorityWeight[b.priority] || 2
         
-        return weightB - weightA
+        if (sortOrder === 'desc') {
+          return weightB - weightA
+        } else {
+          return weightA - weightB
+        }
       })
     }
 
@@ -79,8 +83,8 @@ function App() {
         <Filter 
           filter={filter} 
           setFilter={setFilter} 
-          sortByPriority={sortByPriority}
-          setSortByPriority={setSortByPriority}
+          sortOrder={sortOrder}
+          setSortOrder={setSortOrder}
         />
 
         <div className="mt-6 space-y-2">
