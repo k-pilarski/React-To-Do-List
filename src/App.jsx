@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react'
 import TodoForm from './components/TodoForm'
 import TodoItem from './components/TodoItem'
 import Filter from './components/Filter'
+import Search from './components/Search'
 
 function App() {
   const [todos, setTodos] = useState(() => {
@@ -15,6 +16,7 @@ function App() {
 
   const [filter, setFilter] = useState("all")
   const [sortOrder, setSortOrder] = useState(null)
+  const [search, setSearch] = useState("")
 
   useEffect(() => {
     localStorage.setItem("todos", JSON.stringify(todos))
@@ -53,6 +55,12 @@ function App() {
       return todo.category === filter
     })
 
+    if (search) {
+      result = result.filter(todo => 
+        todo.text.toLowerCase().includes(search.toLowerCase())
+      )
+    }
+
     if (sortOrder) {
       const priorityWeight = { high: 3, normal: 2, low: 1 }
       
@@ -75,10 +83,11 @@ function App() {
 
   return (
     <div className="min-h-screen w-full bg-gray-100 flex items-center justify-center py-10">
-      <div className="bg-white p-8 rounded-xl shadow-lg w-full max-w-xl">
+      <div className="bg-white p-8 rounded-xl shadow-lg w-full max-w-2xl">
         <h1 className="text-2xl font-bold mb-6 text-gray-800 text-center">My To Do List</h1>
         
         <TodoForm addTodo={addTodo} />
+        <Search search={search} setSearch={setSearch} />
 
         <Filter 
           filter={filter} 
@@ -99,7 +108,7 @@ function App() {
           ))}
           
           {displayedTodos.length === 0 && todos.length > 0 && (
-            <p className="text-gray-400 text-center text-sm">No tasks match your criteria.</p>
+            <p className="text-gray-400 text-center text-sm">No tasks match your search.</p>
           )}
 
           {todos.length === 0 && (
