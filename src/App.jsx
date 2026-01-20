@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react'
+import { useAutoAnimate } from '@formkit/auto-animate/react'
 import TodoForm from './components/TodoForm'
 import TodoItem from './components/TodoItem'
 import Filter from './components/Filter'
@@ -17,6 +18,8 @@ function App() {
   const [filter, setFilter] = useState("all")
   const [sortOrder, setSortOrder] = useState(null)
   const [search, setSearch] = useState("")
+
+  const [animationParent] = useAutoAnimate()
 
   useEffect(() => {
     localStorage.setItem("todos", JSON.stringify(todos))
@@ -96,7 +99,7 @@ function App() {
           setSortOrder={setSortOrder}
         />
 
-        <div className="mt-6 space-y-2">
+        <div ref={animationParent} className="mt-6 space-y-2">
           {displayedTodos.map((todo) => (
             <TodoItem 
               key={todo.id} 
