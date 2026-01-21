@@ -46,6 +46,10 @@ function App() {
     setTodos(todos.filter(todo => todo.id !== id))
   }
 
+  const deleteCompleted = () => {
+    setTodos(todos.filter(todo => !todo.isCompleted))
+  }
+
   const editTodo = (id, newText, newCategory, newPriority) => {
     setTodos(todos.map(todo => 
       todo.id === id ? { ...todo, text: newText, category: newCategory, priority: newPriority } : todo
@@ -86,7 +90,7 @@ function App() {
 
   return (
     <div className="min-h-screen w-full bg-gray-100 flex items-center justify-center py-10">
-      <div className="bg-white p-8 rounded-xl shadow-lg w-full max-w-2xl">
+      <div className="bg-white p-8 rounded-xl shadow-lg w-full max-w-2xl relative">
         <h1 className="text-2xl font-bold mb-6 text-gray-800 text-center">My To Do List</h1>
         
         <TodoForm addTodo={addTodo} />
@@ -118,6 +122,18 @@ function App() {
             <p className="text-gray-400 text-center">No tasks yet. Add one above!</p>
           )}
         </div>
+
+        {todos.some(todo => todo.isCompleted) && (
+          <div className="mt-8 flex justify-center border-t border-gray-100 pt-4">
+            <button 
+              onClick={deleteCompleted}
+              className="text-red-500 hover:text-red-700 text-sm font-medium hover:underline transition-colors flex items-center gap-2"
+            >
+              🗑️ Clear Completed Tasks
+            </button>
+          </div>
+        )}
+
       </div>
     </div>
   )
