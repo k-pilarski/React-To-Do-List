@@ -88,6 +88,9 @@ function App() {
 
   const displayedTodos = getProcessedTodos()
 
+  const activeCount = todos.filter(t => !t.isCompleted).length
+  const hasCompleted = todos.some(t => t.isCompleted)
+
   return (
     <div className="min-h-screen w-full bg-gray-100 flex items-center justify-center py-10">
       <div className="bg-white p-8 rounded-xl shadow-lg w-full max-w-2xl relative">
@@ -95,7 +98,7 @@ function App() {
         
         <TodoForm addTodo={addTodo} />
         <Search search={search} setSearch={setSearch} />
-
+        
         <Filter 
           filter={filter} 
           setFilter={setFilter} 
@@ -123,16 +126,20 @@ function App() {
           )}
         </div>
 
-        {todos.some(todo => todo.isCompleted) && (
-          <div className="mt-8 flex justify-center border-t border-gray-100 pt-4">
+        <div className="mt-8 flex justify-between items-center border-t border-gray-100 pt-4">
+          <span className="text-gray-400 text-sm font-medium">
+            {activeCount} {activeCount === 1 ? 'task' : 'tasks'} remaining
+          </span>
+
+          {hasCompleted && (
             <button 
               onClick={deleteCompleted}
-              className="text-red-500 hover:text-red-700 text-sm font-medium hover:underline transition-colors flex items-center gap-2"
+              className="text-red-500 hover:text-red-700 text-sm font-medium hover:underline transition-colors flex items-center gap-1"
             >
-              🗑️ Clear Completed Tasks
+              🗑️ Clear Completed
             </button>
-          </div>
-        )}
+          )}
+        </div>
 
       </div>
     </div>
