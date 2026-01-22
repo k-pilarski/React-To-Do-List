@@ -4,15 +4,17 @@ import TodoForm from './components/TodoForm'
 import TodoItem from './components/TodoItem'
 import Filter from './components/Filter'
 import Search from './components/Search'
+import ThemeToggle from './components/ThemeToggle'
 
 function App() {
   const [todos, setTodos] = useState(() => {
     const savedTodos = localStorage.getItem("todos")
-    if (savedTodos) {
-      return JSON.parse(savedTodos)
-    } else {
-      return []
-    }
+    return savedTodos ? JSON.parse(savedTodos) : []
+  })
+
+  const [darkMode, setDarkMode] = useState(() => {
+    const savedMode = localStorage.getItem("darkMode")
+    return savedMode === "true"
   })
 
   const [filter, setFilter] = useState("all")
@@ -24,6 +26,10 @@ function App() {
   useEffect(() => {
     localStorage.setItem("todos", JSON.stringify(todos))
   }, [todos])
+
+  useEffect(() => {
+    localStorage.setItem("darkMode", darkMode)
+  }, [darkMode])
 
   const addTodo = (text, category, priority) => {
     const newTodo = {
@@ -70,40 +76,42 @@ function App() {
 
     if (sortOrder) {
       const priorityWeight = { high: 3, normal: 2, low: 1 }
-      
       result.sort((a, b) => {
         const weightA = priorityWeight[a.priority] || 2
         const weightB = priorityWeight[b.priority] || 2
-        
-        if (sortOrder === 'desc') {
-          return weightB - weightA
-        } else {
-          return weightA - weightB
-        }
+        return sortOrder === 'desc' ? weightB - weightA : weightA - weightB
       })
     }
-
     return result
   }
 
   const displayedTodos = getProcessedTodos()
-
   const activeCount = todos.filter(t => !t.isCompleted).length
   const hasCompleted = todos.some(t => t.isCompleted)
 
   return (
-    <div className="min-h-screen w-full bg-gray-100 flex items-center justify-center py-10">
-      <div className="bg-white p-8 rounded-xl shadow-lg w-full max-w-2xl relative">
-        <h1 className="text-2xl font-bold mb-6 text-gray-800 text-center">My To Do List</h1>
+    <div className={`min-h-screen w-full flex items-center justify-center py-10 transition-colors duration-300 ${
+      darkMode ? 'bg-gray-900' : 'bg-gray-100'
+    }`}>
+      
+      <div className={`p-8 rounded-xl shadow-lg w-full max-w-2xl relative transition-colors duration-300 ${
+        darkMode ? 'bg-gray-800 text-white' : 'bg-white text-gray-800'
+      }`}>
         
-        <TodoForm addTodo={addTodo} />
-        <Search search={search} setSearch={setSearch} />
+        <div className="flex justify-between items-center mb-6">
+          <h1 className="text-2xl font-bold text-center flex-1">My To Do List</h1>
+          <ThemeToggle darkMode={darkMode} setDarkMode={setDarkMode} />
+        </div>
+        
+        <TodoForm addTodo={addTodo} darkMode={darkMode} />
+        <Search search={search} setSearch={setSearch} darkMode={darkMode} />
         
         <Filter 
           filter={filter} 
           setFilter={setFilter} 
           sortOrder={sortOrder}
           setSortOrder={setSortOrder}
+          darkMode={darkMode}
         />
 
         <div ref={animationParent} className="mt-6 space-y-2">
@@ -114,20 +122,27 @@ function App() {
               toggleComplete={toggleComplete} 
               deleteTodo={deleteTodo}
               editTodo={editTodo}
+              darkMode={darkMode}
             />
           ))}
           
           {displayedTodos.length === 0 && todos.length > 0 && (
-            <p className="text-gray-400 text-center text-sm">No tasks match your search.</p>
+            <p className={`text-center text-sm ${darkMode ? 'text-gray-500' : 'text-gray-400'}`}>
+              No tasks match your search.
+            </p>
           )}
 
           {todos.length === 0 && (
-            <p className="text-gray-400 text-center">No tasks yet. Add one above!</p>
+            <p className={`text-center ${darkMode ? 'text-gray-500' : 'text-gray-400'}`}>
+              No tasks yet. Add one above!
+            </p>
           )}
         </div>
 
-        <div className="mt-8 flex justify-between items-center border-t border-gray-100 pt-4">
-          <span className="text-gray-400 text-sm font-medium">
+        <div className={`mt-8 flex justify-between items-center border-t pt-4 ${
+          darkMode ? 'border-gray-700' : 'border-gray-100'
+        }`}>
+          <span className={`text-sm font-medium ${darkMode ? 'text-gray-400' : 'text-gray-400'}`}>
             {activeCount} {activeCount === 1 ? 'task' : 'tasks'} remaining
           </span>
 

@@ -1,6 +1,6 @@
 import { useState } from 'react'
 
-function TodoItem({ todo, toggleComplete, deleteTodo, editTodo }) {
+function TodoItem({ todo, toggleComplete, deleteTodo, editTodo, darkMode }) {
   const [isEditing, setIsEditing] = useState(false)
   const [newText, setNewText] = useState(todo.text)
   const [newCategory, setNewCategory] = useState(todo.category)
@@ -28,21 +28,25 @@ function TodoItem({ todo, toggleComplete, deleteTodo, editTodo }) {
   }
 
   const getBorderColor = () => {
-    if (todo.isCompleted) return 'border-gray-100'
+    if (todo.isCompleted) return darkMode ? 'border-gray-700' : 'border-gray-100'
     if (todo.priority === 'high') return 'border-l-4 border-l-red-500'
-    if (todo.priority === 'low')  return 'border-l-4 border-l-green-500' 
-    return 'border-gray-100'
+    if (todo.priority === 'low')  return 'border-l-4 border-l-green-500'
+    return darkMode ? 'border-gray-700' : 'border-gray-100'
   }
 
- return (
-    <div className={`flex justify-between items-center bg-white p-4 mb-2 rounded-lg shadow-sm border hover:shadow-md transition-shadow ${getBorderColor()}`}>
+  return (
+    <div className={`flex justify-between items-center p-4 mb-2 rounded-lg shadow-sm border hover:shadow-md transition-all ${getBorderColor()} ${
+      darkMode ? 'bg-gray-700 text-white border-gray-600' : 'bg-white text-gray-800 border-gray-100'
+    }`}>
       
       <div className="flex-1 flex items-center gap-3 overflow-hidden">
-
+        
         <div 
           onClick={() => toggleComplete(todo.id)}
           className={`w-5 h-5 rounded-full border-2 cursor-pointer flex items-center justify-center flex-shrink-0 ${
-            todo.isCompleted ? 'bg-green-500 border-green-500' : 'border-gray-300'
+            todo.isCompleted 
+              ? 'bg-green-500 border-green-500' 
+              : (darkMode ? 'border-gray-500' : 'border-gray-300')
           }`}
         >
           {todo.isCompleted && <span className="text-white text-xs">✓</span>}
@@ -54,30 +58,15 @@ function TodoItem({ todo, toggleComplete, deleteTodo, editTodo }) {
               type="text"
               value={newText}
               onChange={(e) => setNewText(e.target.value)}
-              className="w-full border-b-2 border-blue-500 focus:outline-none px-1 text-gray-700"
+              className={`w-full border-b-2 focus:outline-none px-1 ${
+                darkMode 
+                  ? 'bg-gray-700 text-white border-blue-400 placeholder-gray-400' 
+                  : 'bg-white text-gray-700 border-blue-500'
+              }`}
               autoFocus 
             />
             <div className="flex gap-2">
-              <select 
-                value={newCategory}
-                onChange={(e) => setNewCategory(e.target.value)}
-                className="text-xs border border-gray-300 rounded p-1 bg-gray-50 focus:outline-none focus:border-blue-500 cursor-pointer"
-              >
-                <option value="general">📂 General</option>
-                <option value="work">💼 Work</option>
-                <option value="home">🏠 Home</option>
-                <option value="urgent">🔥 Urgent</option>
-              </select>
-
-              <select 
-                value={newPriority}
-                onChange={(e) => setNewPriority(e.target.value)}
-                className="text-xs border border-gray-300 rounded p-1 bg-gray-50 focus:outline-none focus:border-blue-500 cursor-pointer"
-              >
-                <option value="low">⬇️ Low</option>
-                <option value="normal">⏺️ Normal</option>
-                <option value="high">⬆️ High</option>
-              </select>
+               <button onClick={handleSave} className="text-green-500 font-bold text-sm">Save</button>
             </div>
           </div>
         ) : (
@@ -85,7 +74,9 @@ function TodoItem({ todo, toggleComplete, deleteTodo, editTodo }) {
              <span 
               onClick={() => toggleComplete(todo.id)}
               className={`cursor-pointer text-lg select-none truncate ${
-                todo.isCompleted ? 'line-through text-gray-400' : 'text-gray-800'
+                todo.isCompleted 
+                  ? (darkMode ? 'line-through text-gray-500' : 'line-through text-gray-400')
+                  : (darkMode ? 'text-gray-100' : 'text-gray-800')
               }`}
             >
               {todo.text}
@@ -107,14 +98,8 @@ function TodoItem({ todo, toggleComplete, deleteTodo, editTodo }) {
       </div>
 
       <div className="flex gap-2 ml-4 self-start sm:self-center">
-        {isEditing ? (
-          <button 
-            onClick={handleSave}
-            className="text-green-600 hover:bg-green-50 px-2 py-1 rounded transition-colors font-medium text-sm"
-          >
-            Save
-          </button>
-        ) : (
+        {isEditing ? null : (
+          <>
           <button 
             onClick={() => {
               setIsEditing(true)
@@ -126,18 +111,17 @@ function TodoItem({ todo, toggleComplete, deleteTodo, editTodo }) {
           >
             Edit
           </button>
+          <button 
+            onClick={() => deleteTodo(todo.id)}
+            className="text-red-500 hover:bg-red-50 px-2 py-1 rounded transition-colors font-medium text-sm"
+          >
+            Delete
+          </button>
+          </>
         )}
-
-        <button 
-          onClick={() => deleteTodo(todo.id)}
-          className="text-red-500 hover:bg-red-50 px-2 py-1 rounded transition-colors font-medium text-sm"
-        >
-          Delete
-        </button>
       </div>
     </div>
   )
 }
-
 
 export default TodoItem
