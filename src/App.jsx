@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
 import { useAutoAnimate } from '@formkit/auto-animate/react'
+import { Toaster, toast } from 'react-hot-toast'
 import TodoForm from './components/TodoForm'
 import TodoItem from './components/TodoItem'
 import Filter from './components/Filter'
@@ -40,26 +41,33 @@ function App() {
       isCompleted: false
     }
     setTodos([...todos, newTodo])
+    toast.success('Task added successfully!')
   }
 
   const toggleComplete = (id) => {
-    setTodos(todos.map(todo => 
-      todo.id === id ? { ...todo, isCompleted: !todo.isCompleted } : todo
-    ))
+    setTodos(todos.map(todo => {
+      if (todo.id === id) {
+        return { ...todo, isCompleted: !todo.isCompleted }
+      }
+      return todo
+    }))
   }
 
   const deleteTodo = (id) => {
     setTodos(todos.filter(todo => todo.id !== id))
+    toast('Task deleted', { icon: '🗑️' })
   }
 
   const deleteCompleted = () => {
     setTodos(todos.filter(todo => !todo.isCompleted))
+    toast.success('Cleaned up completed tasks!')
   }
 
   const editTodo = (id, newText, newCategory, newPriority) => {
     setTodos(todos.map(todo => 
       todo.id === id ? { ...todo, text: newText, category: newCategory, priority: newPriority } : todo
     ))
+    toast.success('Task updated!')
   }
 
   const getProcessedTodos = () => {
@@ -94,6 +102,16 @@ function App() {
       darkMode ? 'bg-gray-900' : 'bg-gray-100'
     }`}>
       
+      <Toaster 
+        position="bottom-right"
+        toastOptions={{
+          style: {
+            background: darkMode ? '#333' : '#fff',
+            color: darkMode ? '#fff' : '#000',
+          },
+        }}
+      />
+
       <div className={`p-8 rounded-xl shadow-lg w-full max-w-2xl relative transition-colors duration-300 ${
         darkMode ? 'bg-gray-800 text-white' : 'bg-white text-gray-800'
       }`}>
