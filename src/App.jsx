@@ -32,12 +32,13 @@ function App() {
     localStorage.setItem("darkMode", darkMode)
   }, [darkMode])
 
-  const addTodo = (text, category, priority) => {
+  const addTodo = (text, category, priority, dueDate) => {
     const newTodo = {
       id: Date.now(),
       text: text,
       category: category,
       priority: priority,
+      dueDate: dueDate,
       isCompleted: false
     }
     setTodos([...todos, newTodo])
@@ -63,9 +64,15 @@ function App() {
     toast.success('Cleaned up completed tasks!')
   }
 
-  const editTodo = (id, newText, newCategory, newPriority) => {
+  const editTodo = (id, newText, newCategory, newPriority, newDueDate) => {
     setTodos(todos.map(todo => 
-      todo.id === id ? { ...todo, text: newText, category: newCategory, priority: newPriority } : todo
+      todo.id === id ? { 
+        ...todo, 
+        text: newText, 
+        category: newCategory, 
+        priority: newPriority, 
+        dueDate: newDueDate
+      } : todo
     ))
     toast.success('Task updated!')
   }

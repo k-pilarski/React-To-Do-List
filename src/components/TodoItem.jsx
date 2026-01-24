@@ -5,6 +5,7 @@ function TodoItem({ todo, toggleComplete, deleteTodo, editTodo, darkMode }) {
   const [newText, setNewText] = useState(todo.text)
   const [newCategory, setNewCategory] = useState(todo.category)
   const [newPriority, setNewPriority] = useState(todo.priority || "normal")
+  const [newDueDate, setNewDueDate] = useState(todo.dueDate || "")
 
   const categoryConfig = {
     general: { label: 'General', style: 'bg-gray-200 text-gray-600' },
@@ -23,16 +24,40 @@ function TodoItem({ todo, toggleComplete, deleteTodo, editTodo, darkMode }) {
   const currentPriority = priorityConfig[todo.priority] || priorityConfig.normal
 
   const handleSave = () => {
-    editTodo(todo.id, newText, newCategory, newPriority)
+    editTodo(todo.id, newText, newCategory, newPriority, newDueDate)
     setIsEditing(false)
   }
 
+  const getDateStatus = (dateString) => {
+    if (!dateString) return null
+    if (todo.isCompleted) return { label: dateString, style: 'text-gray-400' }
+
+    const today = new Date().toISOString().split('T')[0]
+    
+    if (dateString < today) {
+      return { label: `Overdue (${dateString})`, style: 'text-red-500 font-bold' } 
+    } else if (dateString === today) {
+      return { label: 'Today!', style: 'text-orange-500 font-bold' }
+    } else {
+      return { label: dateString, style: darkMode ? 'text-gray-400' : 'text-gray-500' }
+    }
+  }
+
+  const dateStatus = getDateStatus(todo.dueDate)
+
   const getBorderColor = () => {
     if (todo.isCompleted) return darkMode ? 'border-gray-700' : 'border-gray-100'
+    
+    if (todo.dueDate && todo.dueDate < new Date().toISOString().split('T')[0]) return 'border-l-4 border-l-red-600'
+
     if (todo.priority === 'high') return 'border-l-4 border-l-red-500'
     if (todo.priority === 'low')  return 'border-l-4 border-l-green-500'
     return darkMode ? 'border-gray-700' : 'border-gray-100'
   }
+
+  const editInputClass = `text-xs border rounded p-1 focus:outline-none cursor-pointer ${
+    darkMode ? 'bg-gray-600 border-gray-500 text-white' : 'bg-gray-50 border-gray-300 text-gray-800'
+  }`
 
   return (
     <div className={`flex justify-between items-center p-4 mb-2 rounded-lg shadow-sm border hover:shadow-md transition-all ${getBorderColor()} ${
@@ -60,29 +85,58 @@ function TodoItem({ todo, toggleComplete, deleteTodo, editTodo, darkMode }) {
               onChange={(e) => setNewText(e.target.value)}
               className={`w-full border-b-2 focus:outline-none px-1 ${
                 darkMode 
-                  ? 'bg-gray-700 text-white border-blue-400 placeholder-gray-400' 
+                  ? 'bg-gray-700 text-white border-blue-400' 
                   : 'bg-white text-gray-700 border-blue-500'
               }`}
               autoFocus 
             />
-            <div className="flex gap-2">
-               <button onClick={handleSave} className="text-green-500 font-bold text-sm">Save</button>
+            <div className="flex flex-wrap gap-2">
+              <select 
+                value={newCategory}
+                onChange={(e) => setNewCategory(e.target.value)}
+                className={editInputClass}
+              >
+                <option value="general">📂 General</option>
+                <option value="work">💼 Work</option>
+                <option value="home">🏠 Home</option>
+                <option value="urgent">🔥 Urgent</option>
+              </select>
+
+              <select 
+                value={newPriority}
+                onChange={(e) => setNewPriority(e.target.value)}
+                className={editInputClass}
+              >
+                <option value="low">⬇️ Low</option>
+                <option value="normal">⏺️ Normal</option>
+                <option value="high">⬆️ High</option>
+              </select>
+
+              <input 
+                type="date"
+                value={newDueDate}
+                onChange={(e) => setNewDueDate(e.target.value)}
+                className={editInputClass}
+              />
             </div>
+            <button onClick={handleSave} className="text-green-500 font-bold text-sm self-start mt-1">Save Changes</button>
           </div>
         ) : (
-          <div className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-3">
-             <span 
-              onClick={() => toggleComplete(todo.id)}
-              className={`cursor-pointer text-lg select-none truncate ${
-                todo.isCompleted 
-                  ? (darkMode ? 'line-through text-gray-500' : 'line-through text-gray-400')
-                  : (darkMode ? 'text-gray-100' : 'text-gray-800')
-              }`}
-            >
-              {todo.text}
-            </span>
+          <div className="flex flex-col w-full">
+            <div className="flex items-center gap-2 mb-1">
+               <span 
+                onClick={() => toggleComplete(todo.id)}
+                className={`cursor-pointer text-lg select-none truncate ${
+                  todo.isCompleted 
+                    ? (darkMode ? 'line-through text-gray-500' : 'line-through text-gray-400')
+                    : (darkMode ? 'text-gray-100' : 'text-gray-800')
+                }`}
+              >
+                {todo.text}
+              </span>
+            </div>
             
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-2 flex-wrap">
               <span className={`text-[10px] uppercase font-bold px-2 py-0.5 rounded-full w-fit ${currentCategory.style}`}>
                 {currentCategory.label}
               </span>
@@ -90,6 +144,12 @@ function TodoItem({ todo, toggleComplete, deleteTodo, editTodo, darkMode }) {
               {todo.priority !== 'normal' && (
                 <span className={`text-[10px] uppercase font-bold px-2 py-0.5 rounded-full w-fit ${currentPriority.style}`}>
                   {currentPriority.label}
+                </span>
+              )}
+
+              {dateStatus && (
+                <span className={`text-[10px] flex items-center gap-1 ${dateStatus.style}`}>
+                  📅 {dateStatus.label}
                 </span>
               )}
             </div>
@@ -106,10 +166,11 @@ function TodoItem({ todo, toggleComplete, deleteTodo, editTodo, darkMode }) {
               setNewText(todo.text)
               setNewCategory(todo.category)
               setNewPriority(todo.priority)
+              setNewDueDate(todo.dueDate || "")
             }}
             className="text-yellow-600 hover:bg-yellow-50 px-2 py-1 rounded transition-colors font-medium text-sm"
           >
-            Edit
+            ✏️ Edit
           </button>
           <button 
             onClick={() => deleteTodo(todo.id)}
