@@ -6,6 +6,7 @@ import TodoItem from './components/TodoItem'
 import Filter from './components/Filter'
 import Search from './components/Search'
 import ThemeToggle from './components/ThemeToggle'
+import ProgressBar from './components/ProgressBar'
 
 function App() {
   const [todos, setTodos] = useState(() => {
@@ -101,8 +102,12 @@ function App() {
   }
 
   const displayedTodos = getProcessedTodos()
-  const activeCount = todos.filter(t => !t.isCompleted).length
-  const hasCompleted = todos.some(t => t.isCompleted)
+  
+  const totalTasks = todos.length
+  const completedTasks = todos.filter(t => t.isCompleted).length
+  
+  const activeCount = totalTasks - completedTasks
+  const hasCompleted = completedTasks > 0
 
   return (
     <div className={`min-h-screen w-full flex items-center justify-center py-10 transition-colors duration-300 ${
@@ -127,6 +132,8 @@ function App() {
           <h1 className="text-2xl font-bold text-center flex-1">My To Do List</h1>
           <ThemeToggle darkMode={darkMode} setDarkMode={setDarkMode} />
         </div>
+
+        <ProgressBar total={totalTasks} completed={completedTasks} darkMode={darkMode} />
         
         <TodoForm addTodo={addTodo} darkMode={darkMode} />
         <Search search={search} setSearch={setSearch} darkMode={darkMode} />
