@@ -56,8 +56,27 @@ function App() {
   }
 
   const deleteTodo = (id) => {
+    const taskToDelete = todos.find(todo => todo.id === id)
+    
     setTodos(todos.filter(todo => todo.id !== id))
-    toast('Task deleted', { icon: '🗑️' })
+
+    toast((t) => (
+      <div className="flex items-center gap-2">
+        <span>Task deleted</span>
+        <button 
+          onClick={() => {
+            setTodos((prev) => [...prev, taskToDelete])
+            toast.dismiss(t.id)
+          }}
+          className="bg-gray-200 hover:bg-gray-300 text-gray-800 px-2 py-1 rounded text-xs font-bold transition-colors"
+        >
+          UNDO
+        </button>
+      </div>
+    ), { 
+      icon: '🗑️',
+      duration: 4000
+    })
   }
 
   const deleteCompleted = () => {
